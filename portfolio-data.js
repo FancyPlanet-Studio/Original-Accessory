@@ -1,21 +1,23 @@
 /*
-  이미지 추가 방법
-  1. images/portfolio/ 폴더에 portfolio_00.webp, portfolio_01.webp ...처럼 올립니다.
-  2. 해당 탭의 lastNumber만 가장 큰 번호로 바꿉니다.
-  높은 번호가 메인 이미지와 썸네일의 가장 앞에 표시됩니다.
+  GitHub에 올릴 폴더 구조
+  images/portfolio/project_00/thumbnail.webp
+  images/portfolio/project_00/portfolio_00.webp
+  images/portfolio/project_00/portfolio_01.webp
 
-  탭을 늘릴 때는 아래 객체를 복사합니다.
-  예: { name: "헤어 악세사리", folder: "images/hair", prefix: "hair_", extension: "webp", lastNumber: 3 }
-  그러면 images/hair/hair_03.webp → hair_00.webp 순으로 표시됩니다.
+  - 왼쪽 세로 썸네일: thumbnail.webp
+  - 오른쪽 작업 이미지: portfolio_00.webp, portfolio_01.webp ...
+  - lastNumber가 2이면 portfolio_02 → portfolio_01 → portfolio_00 순으로 표시됩니다.
+  - 새 작업은 project_01, project_02처럼 폴더를 만들고 아래 목록에 한 줄 추가하세요.
+  - 목록 위에 적은 작업이 왼쪽 썸네일에서 먼저 표시됩니다.
 */
-const portfolioTabs = [
-  { name: "포트폴리오", folder: "images/portfolio", prefix: "portfolio_", extension: "webp", lastNumber: -1 }
+const portfolioProjects = [
+  // { folder: "images/portfolio/project_00", thumbnail: "thumbnail.webp", imagePrefix: "portfolio_", extension: "webp", lastNumber: 2 }
 ];
 
-function buildPortfolioItems(tab) {
-  return Array.from({ length: tab.lastNumber + 1 }, (_, index) => {
-    const number = String(tab.lastNumber - index).padStart(2, "0");
-    return { image: `${tab.folder}/${tab.prefix}${number}.${tab.extension}` };
+function buildProjectImages(project) {
+  return Array.from({ length: project.lastNumber + 1 }, (_, index) => {
+    const number = String(project.lastNumber - index).padStart(2, "0");
+    return `${project.folder}/${project.imagePrefix}${number}.${project.extension}`;
   });
 }
-portfolioTabs.forEach(tab => { tab.items = buildPortfolioItems(tab); });
+portfolioProjects.forEach(project => { project.images = buildProjectImages(project); });
