@@ -71,14 +71,18 @@ topButton.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "s
 const toast = document.querySelector("#toast"); let toastTimer;
 function showToast(message) { toast.textContent = message; toast.classList.add("is-visible"); clearTimeout(toastTimer); toastTimer = setTimeout(() => toast.classList.remove("is-visible"), 2300); }
 function legacyCopy(text) {
+  const scrollX = window.scrollX;
+  const scrollY = window.scrollY;
   const area = document.createElement("textarea");
   area.value = text;
   area.setAttribute("readonly", "");
   area.style.cssText = "position:fixed;top:-9999px;left:-9999px;opacity:0";
   document.body.append(area);
-  area.focus(); area.select(); area.setSelectionRange(0, area.value.length);
+  try { area.focus({ preventScroll: true }); } catch { area.focus(); }
+  area.select(); area.setSelectionRange(0, area.value.length);
   const copied = document.execCommand("copy");
   area.remove();
+  window.scrollTo(scrollX, scrollY);
   return copied;
 }
 async function copyInquiry(text) {
