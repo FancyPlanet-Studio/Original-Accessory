@@ -1,7 +1,7 @@
 const portfolioProjects = [
   {
     folder: "Original_Assets/Project_01",
-    files: ["Portfolio_00.png", "Portfolio_01.png"]
+    files: ["Portfolio_01.png", "Portfolio_02.png"]
   },
   {
     folder: "Original_Assets/Project_02",
