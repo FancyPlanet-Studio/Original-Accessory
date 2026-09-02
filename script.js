@@ -18,7 +18,7 @@ function renderProjects() {
     button.setAttribute("aria-current", String(index === selectedProject));
     button.setAttribute("aria-label", `${index + 1}번 작업 보기`);
     const image = new Image();
-    image.src = `${project.folder}/${project.thumbnail}`;
+    image.src = project.images[0];
     image.alt = ""; image.loading = "lazy"; image.decoding = "async";
     button.append(image);
     button.addEventListener("click", () => { selectedProject = index; selectedImage = 0; renderGallery(); });
