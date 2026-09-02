@@ -6,6 +6,18 @@ const portfolioProjects = [
   {
     folder: "Original_Assets/Project_02",
     files: ["Portfolio_01.png", "Portfolio_02.gif"]
+  },
+  {
+    folder: "Original_Assets/Project_03",
+    files: ["Portfolio_01.png"]
+  },
+  {
+    folder: "Original_Assets/Project_04",
+    files: ["Portfolio_01.png"]
+  },
+  {
+    folder: "Original_Assets/Project_05",
+    files: ["Portfolio_01.png"]
   }
 ];
 
