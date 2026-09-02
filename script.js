@@ -30,6 +30,7 @@ function renderGallery() {
   workCount.hidden = !hasItems || items.length < 2; upButton.disabled = !hasItems; downButton.disabled = !hasItems;
   if (hasItems) {
     mainImage.src = item.image; mainImage.alt = item.title ? `${item.title} 포트폴리오 이미지` : "포트폴리오 이미지";
+    mainImage.decoding = "async"; mainImage.fetchPriority = "high";
     workTitle.textContent = item.title || ""; workDescription.textContent = item.description || "";
     workDetails.hidden = !item.title && !item.description;
     document.querySelector("#current-item").textContent = selectedItem + 1; document.querySelector("#total-items").textContent = items.length;
@@ -37,9 +38,11 @@ function renderGallery() {
   thumbnailList.replaceChildren(...items.map((item, index) => {
     const button = document.createElement("button"); button.type = "button"; button.setAttribute("aria-current", String(index === selectedItem));
     button.setAttribute("aria-label", `${activeTab().name} ${index + 1}번 작품 보기`);
-    const image = new Image(); image.src = item.image; image.alt = ""; image.loading = "lazy"; button.append(image);
+    const image = new Image(); image.src = item.image; image.alt = ""; image.loading = "lazy"; image.decoding = "async"; button.append(image);
     button.addEventListener("click", () => { selectedItem = index; renderGallery(); }); return button;
   }));
+  const nextItem = items[(selectedItem + 1) % items.length];
+  if (items.length > 1 && nextItem) { const preload = new Image(); preload.src = nextItem.image; preload.decoding = "async"; }
   renderTabs();
 }
 function changeItem(direction) { const items = activeItems(); if (items.length < 2) return; selectedItem = (selectedItem + direction + items.length) % items.length; renderGallery(); }
@@ -59,6 +62,22 @@ document.querySelector("#copy-inquiry").addEventListener("click", async () => {
   try { await navigator.clipboard.writeText(text); showToast("문의 양식이 복사되었습니다."); }
   catch { const area = document.createElement("textarea"); area.value = text; document.body.append(area); area.select(); document.execCommand("copy"); area.remove(); showToast("문의 양식이 복사되었습니다."); }
 });
-function reportHeight() { window.parent?.postMessage({ type: "resize_iframe", height: Math.ceil(document.documentElement.scrollHeight) }, "*"); }
-new ResizeObserver(reportHeight).observe(document.body); window.addEventListener("load", reportHeight); window.addEventListener("message", event => { if (event.data?.type === "getHeight") reportHeight(); });
+let heightFrameId = 0; let lastReportedHeight = 0; let forceHeightReport = false;
+function reportHeight(force = false) {
+  forceHeightReport ||= force;
+  if (heightFrameId) return;
+  heightFrameId = requestAnimationFrame(() => {
+    heightFrameId = 0;
+    const height = Math.ceil(document.documentElement.scrollHeight);
+    if (forceHeightReport || height !== lastReportedHeight) {
+      lastReportedHeight = height;
+      window.parent?.postMessage({ type: "resize_iframe", height }, "*");
+    }
+    forceHeightReport = false;
+  });
+}
+new ResizeObserver(() => reportHeight()).observe(document.body);
+window.addEventListener("load", () => reportHeight(true));
+window.addEventListener("resize", () => reportHeight(true), { passive: true });
+window.addEventListener("message", event => { if (event.data?.type === "getHeight") reportHeight(true); });
 renderGallery();
