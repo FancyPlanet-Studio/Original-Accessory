@@ -581,7 +581,9 @@ body {
 
 .inquiry-form > button {
   display: flex;
-  justify-content: space-between;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
   width: 100%;
   min-height: 46px;
   margin-top: 23px;
@@ -597,7 +599,21 @@ body {
 }
 
 .inquiry-form > button:hover { background: #504879; }
-.inquiry-form > button span { font-size: 18px; line-height: 1; }
+.inquiry-form > button span:last-child { font-size: 18px; line-height: 1; }
+
+.copy-status {
+  min-height: 24px;
+  margin: 8px 0 0;
+  color: var(--deep);
+  font-size: 13px;
+  line-height: 1.8;
+  text-align: center;
+  opacity: 0;
+  transition: opacity .18s ease;
+}
+
+.copy-status.is-visible { opacity: 1; }
+.copy-status.is-error { color: #9b4358; }
 
 /* 주의사항과 푸터 */
 .notice { padding: 90px 0; }
@@ -691,27 +707,6 @@ footer p {
   opacity: 1;
   visibility: visible;
   transform: none;
-}
-
-.toast {
-  position: fixed;
-  z-index: 11;
-  bottom: 24px;
-  left: 50%;
-  padding: 10px 15px;
-  transform: translate(-50%, 14px);
-  background: #2c2938;
-  color: #fff;
-  font-size: 12px;
-  opacity: 0;
-  visibility: hidden;
-  transition: .18s;
-}
-
-.toast.is-visible {
-  opacity: 1;
-  visibility: visible;
-  transform: translate(-50%, 0);
 }
 
 @media (max-width: 700px) {
@@ -861,7 +856,6 @@ footer p {
   html { scroll-behavior: auto; }
 
   .top-button,
-  .toast,
   .quick-nav button::after {
     transition: none;
   }
