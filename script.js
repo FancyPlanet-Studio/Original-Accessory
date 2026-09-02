@@ -70,17 +70,37 @@ window.addEventListener("scroll", () => topButton.classList.toggle("is-visible",
 topButton.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
 const toast = document.querySelector("#toast"); let toastTimer;
 function showToast(message) { toast.textContent = message; toast.classList.add("is-visible"); clearTimeout(toastTimer); toastTimer = setTimeout(() => toast.classList.remove("is-visible"), 2300); }
+function legacyCopy(text) {
+  const area = document.createElement("textarea");
+  area.value = text;
+  area.setAttribute("readonly", "");
+  area.style.cssText = "position:fixed;top:-9999px;left:-9999px;opacity:0";
+  document.body.append(area);
+  area.focus(); area.select(); area.setSelectionRange(0, area.value.length);
+  const copied = document.execCommand("copy");
+  area.remove();
+  return copied;
+}
+async function copyInquiry(text) {
+  if (legacyCopy(text)) return true;
+  if (!navigator.clipboard?.writeText) return false;
+  try {
+    return await Promise.race([
+      navigator.clipboard.writeText(text).then(() => true),
+      new Promise(resolve => setTimeout(() => resolve(false), 700))
+    ]);
+  } catch { return false; }
+}
 document.querySelector("#copy-inquiry").addEventListener("click", async () => {
   const text = [...document.querySelectorAll("#inquiry-form [name]")].map(field => `- ${field.name} : ${field.value.trim()}`).join("\n");
-  try { await navigator.clipboard.writeText(text); showToast("문의 양식이 복사되었습니다."); }
-  catch { const area = document.createElement("textarea"); area.value = text; document.body.append(area); area.select(); document.execCommand("copy"); area.remove(); showToast("문의 양식이 복사되었습니다."); }
+  showToast((await copyInquiry(text)) ? "문의 양식이 복사되었습니다." : "복사에 실패했습니다. 다시 시도해주세요.");
 });
 let heightFrameId = 0; let lastReportedHeight = 0; let forceHeightReport = false;
 function reportHeight(force = false) {
   forceHeightReport ||= force; if (heightFrameId) return;
-  heightFrameId = requestAnimationFrame(() => { heightFrameId = 0; const height = Math.ceil(document.documentElement.scrollHeight); if (forceHeightReport || height !== lastReportedHeight) { lastReportedHeight = height; window.parent?.postMessage({ type: "resize_iframe", height }, "*"); } forceHeightReport = false; });
+  heightFrameId = requestAnimationFrame(() => { heightFrameId = 0; const height = Math.ceil(document.documentElement.scrollHeight); if (forceHeightReport || height !== lastReportedHeight) { lastReportedHeight = height; window.parent?.postMessage({ type: "fancy-planet:resize", height }, "*"); } forceHeightReport = false; });
 }
 new ResizeObserver(() => reportHeight()).observe(document.body);
 window.addEventListener("load", () => reportHeight(true)); window.addEventListener("resize", () => reportHeight(true), { passive: true });
-window.addEventListener("message", event => { if (event.data?.type === "getHeight") reportHeight(true); });
+window.addEventListener("message", event => { if (event.data?.type === "fancy-planet:request-height") reportHeight(true); });
 renderGallery();
